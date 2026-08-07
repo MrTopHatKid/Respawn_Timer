@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
 <meta charset="UTF-8">
@@ -57,16 +58,8 @@ box-shadow:0 0 30px black;
 
 
 
-h1{
-
-margin-top:0;
-
-}
-
-
 
 /* TIMER CIRCLE */
-
 
 .circle{
 
@@ -128,12 +121,31 @@ font-weight:bold;
 
 
 
+.startFlash{
+
+animation:startFlash .4s infinite;
+
+}
+
+
+
+@keyframes startFlash{
+
+50%{
+
+opacity:.3;
+
+}
+
+}
+
+
+
 .warning{
 
 color:red;
 
 }
-
 
 
 
@@ -150,11 +162,11 @@ margin:5px;
 
 border-radius:12px;
 
-background:#374151;
+font-size:18px;
 
 color:white;
 
-font-size:18px;
+background:#374151;
 
 cursor:pointer;
 
@@ -166,7 +178,7 @@ touch-action:manipulation;
 
 button:active{
 
-transform:scale(.95);
+transform:scale(.9);
 
 }
 
@@ -235,6 +247,7 @@ background:#2563eb;
 
 
 
+
 input{
 
 width:100px;
@@ -250,6 +263,7 @@ border-radius:10px;
 border:none;
 
 }
+
 
 
 
@@ -270,6 +284,7 @@ margin-top:12px;
 border-radius:12px;
 
 }
+
 
 
 
@@ -395,7 +410,6 @@ background:white;
 
 
 
-
 @media(max-width:400px){
 
 
@@ -408,7 +422,6 @@ height:220px;
 }
 
 
-
 .circle::before{
 
 width:175px;
@@ -416,7 +429,6 @@ width:175px;
 height:175px;
 
 }
-
 
 
 .timer{
@@ -441,7 +453,6 @@ font-size:26px;
 }
 
 
-
 </style>
 
 </head>
@@ -459,13 +470,11 @@ font-size:26px;
 
 <div class="circle" id="circle">
 
-
 <div id="display" class="timer">
 
 00:30
 
 </div>
-
 
 </div>
 
@@ -477,7 +486,6 @@ font-size:26px;
 START
 
 </button>
-
 
 
 <br>
@@ -503,13 +511,12 @@ START
 <h3>Timer Duration</h3>
 
 
-
 <button class="small" onclick="changeTime(-5)">
 -5
 </button>
 
 
-<input id="customTime" value="30" type="number">
+<input id="customTime" type="number" value="30">
 
 
 <button class="small" onclick="changeTime(5)">
@@ -524,7 +531,6 @@ START
 
 
 <div class="multiplier">
-
 
 <button onclick="multiStart(2)">
 2X
@@ -545,12 +551,7 @@ START
 
 <div class="toggle">
 
-
-<span>
-
-Five of Time
-
-</span>
+<span>Five of Time</span>
 
 
 <label class="switch">
@@ -568,14 +569,10 @@ Five of Time
 
 
 
+
 <div class="toggle">
 
-
-<span>
-
-No Respawn Time
-
-</span>
+<span>No Respawn Time</span>
 
 
 <label class="switch">
@@ -588,7 +585,6 @@ No Respawn Time
 
 
 </div>
-
 
 
 
@@ -622,13 +618,11 @@ let running=false;
 let fiveValue=0;
 
 
-
 const display=document.getElementById("display");
 
 const circle=document.getElementById("circle");
 
 const noRespawnToggle=document.getElementById("noRespawn");
-
 
 
 
@@ -640,6 +634,7 @@ function updateDisplay(){
 let min=Math.floor(seconds/60);
 
 let sec=seconds%60;
+
 
 
 display.innerHTML=
@@ -671,19 +666,26 @@ circle.style.background=
 
 
 
+
+
 function startTimer(){
 
 
 
 if(running)
+
 return;
 
 
+
+
+// Five of Time
 
 if(document.getElementById("fiveTime").checked){
 
 
 fiveValue+=5;
+
 
 
 if(fiveValue>60){
@@ -693,10 +695,13 @@ fiveValue=0;
 }
 
 
+
 seconds=fiveValue;
 
 
 }
+
+
 
 
 
@@ -708,6 +713,26 @@ updateDisplay();
 
 
 running=true;
+
+
+
+
+// Flash starting timer
+
+display.classList.add("startFlash");
+
+
+
+setTimeout(()=>{
+
+
+display.classList.remove("startFlash");
+
+
+},3000);
+
+
+
 
 
 
@@ -723,7 +748,9 @@ updateDisplay();
 
 if(seconds<=0){
 
+
 finishTimer();
+
 
 }
 
@@ -741,7 +768,10 @@ finishTimer();
 
 
 
+
+
 function multiStart(value){
+
 
 
 if(value==2){
@@ -775,6 +805,10 @@ startTimer();
 
 
 
+
+// No Respawn automatic start
+
+
 noRespawnToggle.addEventListener("change",function(){
 
 
@@ -782,20 +816,23 @@ noRespawnToggle.addEventListener("change",function(){
 if(this.checked){
 
 
-
 clearInterval(timer);
-
-
-seconds=45;
-
-totalSeconds=45;
 
 
 running=false;
 
 
-startTimer();
 
+seconds=45;
+
+
+totalSeconds=45;
+
+
+updateDisplay();
+
+
+startTimer();
 
 
 }
@@ -833,7 +870,6 @@ running=false;
 function resetTimer(){
 
 
-
 clearInterval(timer);
 
 
@@ -841,19 +877,22 @@ running=false;
 
 
 
-seconds=parseInt(
-document.getElementById("customTime").value
-);
+seconds=30;
 
 
-totalSeconds=seconds;
+totalSeconds=30;
+
+
+
+document.getElementById("customTime").value=30;
+
 
 
 updateDisplay();
 
 
-
 }
+
 
 
 
@@ -892,7 +931,6 @@ totalSeconds=value;
 updateDisplay();
 
 
-
 }
 
 
@@ -904,7 +942,6 @@ updateDisplay();
 
 
 function finishTimer(){
-
 
 
 clearInterval(timer);
@@ -953,6 +990,8 @@ normalBeep();
 
 
 
+
+
 setTimeout(()=>{
 
 
@@ -961,6 +1000,21 @@ document.getElementById("timeup")
 
 
 document.body.classList.remove("flash");
+
+
+// Restore default
+
+seconds=30;
+
+totalSeconds=30;
+
+
+document.getElementById("customTime").value=30;
+
+
+
+updateDisplay();
+
 
 
 },3000);
@@ -995,6 +1049,7 @@ osc.frequency.value=700;
 
 osc.connect(gain);
 
+
 gain.connect(ctx.destination);
 
 
@@ -1017,6 +1072,7 @@ osc.stop(ctx.currentTime+3);
 
 
 
+
 function threeBeeps(){
 
 
@@ -1026,7 +1082,6 @@ let ctx=new AudioContext();
 
 
 for(let i=0;i<3;i++){
-
 
 
 let osc=ctx.createOscillator();
@@ -1039,7 +1094,6 @@ let gain=ctx.createGain();
 osc.frequency.value=900;
 
 
-
 osc.connect(gain);
 
 
@@ -1047,21 +1101,21 @@ gain.connect(ctx.destination);
 
 
 
-let start=ctx.currentTime+(i*.8);
+let time=ctx.currentTime+(i*.8);
 
 
 
-gain.gain.setValueAtTime(.3,start);
+gain.gain.setValueAtTime(.3,time);
 
 
-gain.gain.setValueAtTime(0,start+.25);
+gain.gain.setValueAtTime(0,time+.25);
 
 
 
-osc.start(start);
+osc.start(time);
 
 
-osc.stop(start+.3);
+osc.stop(time+.3);
 
 
 
@@ -1069,6 +1123,7 @@ osc.stop(start+.3);
 
 
 }
+
 
 
 
@@ -1094,8 +1149,8 @@ updateDisplay();
 
 
 
-updateDisplay();
 
+updateDisplay();
 
 
 </script>
