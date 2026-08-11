@@ -3,2168 +3,1605 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-<title>Respawn Timer</title>
+<title>Respawn Timer & Tarot Cards</title>
 
 <style>
-
-/* =====================================================
-   GLOBAL
-===================================================== */
-
-*{
-    box-sizing:border-box;
-    font-family:Arial,Helvetica,sans-serif;
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
-html,body{
-    margin:0;
-    padding:0;
-    width:100%;
-    min-height:100%;
+html,
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #111827;
+    color: white;
 }
 
-body{
-    min-height:100vh;
-    background:#111827;
-    color:white;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-
-    padding:15px;
-
-    overflow-x:hidden;
+body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px;
+    overflow-x: hidden;
 }
 
-button{
-    border:none;
-    cursor:pointer;
-    color:white;
-
-    touch-action:manipulation;
-    -webkit-tap-highlight-color:transparent;
+button {
+    border: 0;
+    cursor: pointer;
+    touch-action: manipulation;
+    color: white;
 }
 
-button:active{
-    transform:scale(.94);
+button:active {
+    transform: scale(.96);
 }
 
+/* ================= TIMER ================= */
 
-/* =====================================================
-   MAIN APP
-===================================================== */
-
-.container{
-    width:100%;
-    max-width:430px;
-
-    background:#1f2937;
-
-    padding:25px;
-
-    border-radius:25px;
-
-    text-align:center;
-
-    box-shadow:
-        0 0 30px rgba(0,0,0,.7);
+.container {
+    width: 100%;
+    max-width: 430px;
+    padding: 22px;
+    border-radius: 25px;
+    background: #1f2937;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(0,0,0,.65);
 }
 
-h1{
-    margin:0 0 10px;
+h1 {
+    margin: 0 0 10px;
 }
 
+.circle {
+    width: 260px;
+    height: 260px;
+    margin: 20px auto;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: conic-gradient(#22c55e 360deg,#374151 360deg);
+}
 
-/* =====================================================
-   CIRCULAR TIMER
-===================================================== */
+.circle::before {
+    content: "";
+    position: absolute;
+    width: 210px;
+    height: 210px;
+    border-radius: 50%;
+    background: #111827;
+}
 
-.circle{
-    width:260px;
-    height:260px;
+.timer {
+    position: relative;
+    z-index: 2;
+    font-size: 60px;
+    font-weight: bold;
+}
 
-    margin:20px auto;
+.startFlash {
+    animation: startFlash .45s ease-in-out infinite;
+}
 
-    border-radius:50%;
+@keyframes startFlash {
+    50% {
+        opacity: .25;
+    }
+}
 
-    display:flex;
-    justify-content:center;
-    align-items:center;
+.startCircle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: #16a34a;
+    font-size: 30px;
+    font-weight: bold;
+    box-shadow: 0 0 25px rgba(22,163,74,.7);
+}
 
-    position:relative;
+.startCircle:hover {
+    box-shadow: 0 0 35px rgba(22,163,74,.95);
+}
+
+.small {
+    padding: 8px 14px;
+    background: #4383cc;
+    margin: 5px;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+.pause {
+    background: #eab308;
+    color: #111;
+}
+
+.reset {
+    background: #dc2626;
+}
+
+input[type="number"] {
+    width: 100px;
+    padding: 10px;
+    font-size: 20px;
+    text-align: center;
+    border: 0;
+    border-radius: 10px;
+}
+
+.multiplier {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.multiplier button {
+    width: 115px;
+    height: 65px;
+    border-radius: 15px;
+    background: #2563eb;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+    padding: 15px;
+    border-radius: 12px;
+    background: #374151;
+}
+
+.switch {
+    width: 55px;
+    height: 28px;
+    position: relative;
+}
+
+.switch input {
+    display: none;
+}
+
+.slider {
+    position: absolute;
+    inset: 0;
+    background: #6b7280;
+    border-radius: 20px;
+    transition: .25s;
+}
+
+.slider:before {
+    content: "";
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    top: 2px;
+    left: 2px;
+    background: white;
+    border-radius: 50%;
+    transition: .3s;
+}
+
+.switch input:checked + .slider {
+    background: #22c55e;
+}
+
+.switch input:checked + .slider:before {
+    transform: translateX(27px);
+}
+
+/* ================= TIME UP ================= */
+
+.timeup {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    background: red;
+    font-size: 70px;
+    font-weight: bold;
+}
+
+.flash {
+    animation: screenFlash .5s infinite;
+}
+
+@keyframes screenFlash {
+    50% {
+        background: #fff;
+    }
+}
+
+/* ================= TAROT BUTTON ================= */
+
+.tarotButton {
+    margin-top: 15px;
+    padding: 11px 18px;
+    border-radius: 10px;
+    background: #4b5563;
+}
+
+.tarotButtonPressed {
+    animation: tarotButtonPress .55s cubic-bezier(.22,1,.36,1);
+}
+
+@keyframes tarotButtonPress {
+    0% {
+        transform: scale(1);
+    }
+    35% {
+        transform: scale(.9);
+    }
+    65% {
+        transform: scale(1.08);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* ================= TAROT OVERLAY ================= */
+
+.tarotOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    background: rgba(0,0,0,.94);
+    opacity: 0;
+    transform: scale(.98);
+    transition:
+        opacity .45s cubic-bezier(.22,1,.36,1),
+        transform .45s cubic-bezier(.22,1,.36,1);
+}
+
+.tarotOverlay.open {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.tarotMenu {
+    width: 100%;
+    max-width: 900px;
+    max-height: 92vh;
+    overflow-y: auto;
+    position: relative;
+    padding: 25px;
+    border-radius: 20px;
+    background: #1f2937;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(0,0,0,.8);
+    opacity: 0;
+    transform: translateY(15px) scale(.98);
+    transition:
+        opacity .45s cubic-bezier(.22,1,.36,1),
+        transform .5s cubic-bezier(.22,1,.36,1);
+}
+
+.tarotOverlay.open .tarotMenu {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.tarotMenu h2 {
+    margin: 5px 0;
+    font-size: 30px;
+}
+
+.tarotSubtitle {
+    color: #9ca3af;
+    margin-top: 5px;
+}
+
+.closeTarot {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    margin: 0;
+    border-radius: 50%;
+    background: #374151;
+    font-size: 18px;
+}
+
+/* ================= TAROT CARDS ================= */
+
+.tarotCards {
+    min-height: 350px;
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    perspective: 1400px;
+    position: relative;
+}
+
+.tarotCard {
+    width: 220px;
+    height: 330px;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+    border-radius: 18px;
+    border: 3px solid rgba(255,255,255,.35);
+    background: linear-gradient(135deg,#374151,#111827);
+    cursor: pointer;
+
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+
+    will-change: transform, opacity, box-shadow, border-color;
+
+    transition:
+        transform .75s cubic-bezier(.22,1,.36,1),
+        opacity .55s ease,
+        box-shadow 2.8s ease-in-out,
+        border-color 2.8s ease-in-out;
+}
+
+.tarotCard::before {
+    content: "✦";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 120px;
+    color: rgba(255,255,255,.05);
+    pointer-events: none;
+}
+
+.tarotCard::after {
+    content: "";
+    position: absolute;
+    inset: -50%;
+    background: radial-gradient(
+        circle,
+        rgba(255,255,255,.08),
+        transparent 55%
+    );
+    pointer-events: none;
+}
+
+/* ================= CARD ENTRANCE ================= */
+
+.cardEntering {
+    opacity: 0;
+    transform: translateY(25px) scale(.94);
+}
+
+.cardEntered {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* ================= RANDOM GLOW ================= */
+
+.randomGlow {
+    transition:
+        box-shadow 3.4s ease-in-out,
+        border-color 3.4s ease-in-out;
+}
+
+/* ================= CARD BACK ================= */
+
+.cardBack {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.cardBackIcon {
+    font-size: 70px;
+    margin-bottom: 15px;
+}
+
+.cardBackText {
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.cardBackSubtext {
+    margin-top: 8px;
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+/* ================= OTHER CARDS ================= */
+
+.disappearing {
+    opacity: 0 !important;
+    transform: scale(.8) translateY(15px) !important;
+    pointer-events: none;
+}
+
+/* ================= REVEALED CARD ================= */
+
+.revealedBackground {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+    border-radius: 15px;
+}
+
+.revealedBackground::before {
+    content: "";
+    position: absolute;
+    width: 220%;
+    height: 220%;
+    left: -60%;
+    top: -60%;
 
     background:
         conic-gradient(
-            #22c55e 360deg,
-            #374151 360deg
+            from 0deg,
+            transparent 0deg,
+            rgba(255,255,255,.16) 35deg,
+            transparent 75deg,
+            transparent 140deg,
+            rgba(255,255,255,.12) 180deg,
+            transparent 220deg,
+            transparent 290deg,
+            rgba(255,255,255,.16) 325deg,
+            transparent 360deg
         );
 
-    transition:
-        background .2s linear;
+    animation: orbitGlow 9s linear infinite;
+    will-change: transform;
 }
 
-.circle::before{
-    content:"";
-
-    position:absolute;
-
-    width:210px;
-    height:210px;
-
-    border-radius:50%;
-
-    background:#111827;
-}
-
-.timer{
-    position:relative;
-    z-index:2;
-
-    font-size:60px;
-    font-weight:bold;
-}
-
-
-/* =====================================================
-   START FLASH
-===================================================== */
-
-.startFlash{
-    animation:startFlash .45s infinite;
-}
-
-@keyframes startFlash{
-
-    50%{
-        opacity:.25;
+@keyframes orbitGlow {
+    from {
+        transform: rotate(0deg);
     }
 
+    to {
+        transform: rotate(360deg);
+    }
 }
 
-
-/* =====================================================
-   LARGE START BUTTON
-===================================================== */
-
-.startCircle{
-
-    width:150px;
-    height:150px;
-
-    border-radius:50%;
-
-    background:#16a34a;
-
-    font-size:30px;
-    font-weight:bold;
-
-    box-shadow:
-        0 0 25px rgba(22,163,74,.7);
+.revealedBackground::after {
+    content: "";
+    position: absolute;
+    inset: 8px;
+    border: 1px solid rgba(255,255,255,.25);
+    border-radius: 12px;
+    box-shadow: inset 0 0 35px rgba(255,255,255,.08);
 }
 
-.startCircle:active{
-    transform:scale(.93);
-}
+/* ================= UNIQUE CARD FRONT ================= */
 
+.revealedContent {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
 
-/* =====================================================
-   SMALL PAUSE / RESET
-===================================================== */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 
-.small{
-    font-size:14px;
+    padding: 25px;
 
-    padding:8px 14px;
-
-    margin:5px;
-
-    border-radius:10px;
-}
-
-.pause{
-    background:#eab308;
-    color:#111;
-}
-
-.reset{
-    background:#dc2626;
-}
-
-
-/* =====================================================
-   MULTIPLIERS
-===================================================== */
-
-.multiplier{
-    display:flex;
-    justify-content:center;
-    gap:10px;
-}
-
-.multiplier button{
-
-    width:110px;
-    height:60px;
-
-    border-radius:14px;
-
-    background:#2563eb;
-
-    font-size:25px;
-    font-weight:bold;
-}
-
-
-/* =====================================================
-   CUSTOM TIMER
-===================================================== */
-
-input[type="number"]{
-
-    width:100px;
-
-    padding:10px;
-
-    font-size:20px;
-
-    text-align:center;
-
-    border-radius:10px;
-
-    border:none;
-
-    background:white;
-    color:#111;
-}
-
-
-/* =====================================================
-   TOGGLES
-===================================================== */
-
-.toggle{
-
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-
-    background:#374151;
-
-    padding:15px;
-
-    margin-top:12px;
-
-    border-radius:12px;
-}
-
-.switch{
-
-    width:55px;
-    height:28px;
-
-    position:relative;
-}
-
-.switch input{
-    display:none;
-}
-
-.slider{
-
-    position:absolute;
-    inset:0;
-
-    background:#6b7280;
-
-    border-radius:20px;
-
-    cursor:pointer;
-}
-
-.slider:before{
-
-    content:"";
-
-    position:absolute;
-
-    width:24px;
-    height:24px;
-
-    left:2px;
-    top:2px;
-
-    background:white;
-
-    border-radius:50%;
-
-    transition:.3s;
-}
-
-input:checked + .slider{
-    background:#22c55e;
-}
-
-input:checked + .slider:before{
-    transform:translateX(27px);
-}
-
-
-/* =====================================================
-   TAROT BUTTON
-===================================================== */
-
-.tarotButton{
-
-    padding:10px 17px;
-
-    margin-top:15px;
-
-    background:#4b5563;
-
-    border-radius:10px;
-
-    font-size:14px;
+    opacity: 0;
+    transform: scale(.86) translateY(10px);
 
     transition:
-        transform .2s ease,
-        box-shadow .2s ease;
+        opacity .55s cubic-bezier(.22,1,.36,1),
+        transform .7s cubic-bezier(.22,1,.36,1);
 }
 
-.tarotButton.tarotButtonPressed{
-
-    animation:
-        tarotButtonPress .35s ease;
+.showRevealed .revealedContent {
+    opacity: 1;
+    transform: scale(1) translateY(0);
 }
 
-@keyframes tarotButtonPress{
-
-    0%{
-        transform:scale(1);
-    }
-
-    40%{
-        transform:scale(.92);
-    }
-
-    70%{
-        transform:scale(1.05);
-    }
-
-    100%{
-        transform:scale(1);
-    }
-
-}
-
-
-/* =====================================================
-   TIME UP
-===================================================== */
-
-.timeup{
-
-    display:none;
-
-    position:fixed;
-
-    inset:0;
-
-    background:red;
-
-    justify-content:center;
-    align-items:center;
-
-    font-size:70px;
-    font-weight:bold;
-
-    z-index:200;
-
-    text-align:center;
-}
-
-.flash{
-    animation:flash .5s infinite;
-}
-
-@keyframes flash{
-
-    50%{
-        background:white;
-    }
-
-}
-
-
-/* =====================================================
-   TAROT OVERLAY
-===================================================== */
-
-.tarotOverlay{
-
-    display:none;
-
-    position:fixed;
-
-    inset:0;
-
-    background:rgba(0,0,0,.93);
-
-    z-index:100;
-
-    justify-content:center;
-    align-items:center;
-
-    padding:15px;
-
-    opacity:0;
-
-    transform:scale(.96);
-
-    transition:
-        opacity .3s ease,
-        transform .3s ease;
-}
-
-.tarotOverlay.tarotOpen{
-
-    opacity:1;
-
-    transform:scale(1);
-}
-
-
-/* =====================================================
-   TAROT WINDOW
-===================================================== */
-
-.tarotMenu{
-
-    width:100%;
-
-    max-width:900px;
-
-    max-height:90vh;
-
-    overflow-y:auto;
-
-    background:#1f2937;
-
-    border-radius:20px;
-
-    padding:25px;
-
-    text-align:center;
-
-    position:relative;
-
-    box-shadow:
-        0 0 40px rgba(0,0,0,.8);
-
-    opacity:0;
-
-    transform:
-        translateY(20px)
-        scale(.95);
-
-    transition:
-        opacity .4s ease .05s,
-        transform .4s cubic-bezier(.2,.8,.2,1) .05s;
-}
-
-.tarotOverlay.tarotOpen .tarotMenu{
-
-    opacity:1;
-
-    transform:
-        translateY(0)
-        scale(1);
-}
-
-
-.tarotMenu h2{
-
-    margin:5px 0;
-
-    font-size:30px;
-}
-
-.tarotSubtitle{
-
-    color:#9ca3af;
-
-    margin-top:5px;
-}
-
-.closeTarot{
-
-    position:absolute;
-
-    right:12px;
-    top:12px;
-
-    width:40px;
-    height:40px;
-
-    padding:0;
-
-    margin:0;
-
-    border-radius:50%;
-
-    background:#374151;
-
-    font-size:18px;
-}
-
-
-/* =====================================================
-   TAROT CARDS
-===================================================== */
-
-.tarotCards{
-
-    display:flex;
-
-    justify-content:center;
-
-    gap:20px;
-
-    margin-top:25px;
-}
-
-
-/* =====================================================
-   CARD ENTRY ANIMATION
-===================================================== */
-
-.tarotOverlay.tarotOpen .tarotCard{
-
-    opacity:0;
-
-    transform:
-        translateY(45px)
-        scale(.9);
-}
-
-
-.tarotOverlay.tarotOpen .tarotCard:nth-child(1){
-
-    animation:
-        tarotCardEnter
-        .5s
-        cubic-bezier(.2,.8,.2,1)
-        .15s
-        forwards;
-}
-
-
-.tarotOverlay.tarotOpen .tarotCard:nth-child(2){
-
-    animation:
-        tarotCardEnter
-        .5s
-        cubic-bezier(.2,.8,.2,1)
-        .25s
-        forwards;
-}
-
-
-.tarotOverlay.tarotOpen .tarotCard:nth-child(3){
-
-    animation:
-        tarotCardEnter
-        .5s
-        cubic-bezier(.2,.8,.2,1)
-        .35s
-        forwards;
-}
-
-
-@keyframes tarotCardEnter{
-
-    0%{
-
-        opacity:0;
-
-        transform:
-            translateY(45px)
-            scale(.9);
-    }
-
-    70%{
-
-        opacity:1;
-
-        transform:
-            translateY(-5px)
-            scale(1.03);
-    }
-
-    100%{
-
-        opacity:1;
-
-        transform:
-            translateY(0)
-            scale(1);
-    }
-
-}
-
-
-/* =====================================================
-   CARD DESIGN
-===================================================== */
-
-.tarotCard{
-
-    width:220px;
-    height:330px;
-
-    border-radius:18px;
-
-    padding:15px;
-
-    cursor:pointer;
-
-    position:relative;
-
-    overflow:hidden;
+.revealedIcon {
+    width: 75px;
+    height: 75px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 14px;
+    border-radius: 50%;
 
     background:
-        linear-gradient(
-            135deg,
-            #374151,
-            #111827
+        radial-gradient(
+            circle,
+            rgba(255,255,255,.2),
+            rgba(255,255,255,.03) 70%
         );
 
-    border:3px solid rgba(255,255,255,.35);
+    border: 1px solid rgba(255,255,255,.3);
 
-    display:flex;
+    font-size: 40px;
 
-    flex-direction:column;
+    animation: iconPulse 2s ease-in-out infinite alternate;
+}
 
-    align-items:center;
+@keyframes iconPulse {
+    from {
+        transform: scale(.97);
+    }
 
-    justify-content:center;
+    to {
+        transform: scale(1.05);
+    }
+}
 
-    color:white;
+.cardRarity {
+    margin-bottom: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.cardName {
+    font-size: 23px;
+    font-weight: bold;
+    line-height: 1.15;
+    text-align: center;
+}
+
+/* ================= RARITY GLOWS ================= */
+
+.tarotCard.mythic {
+    border-color: #fff4a3 !important;
 
     box-shadow:
-        0 0 12px rgba(255,255,255,.2);
+        0 0 8px #fff4a3,
+        0 0 20px #fff4a3,
+        0 0 40px #fff4a3,
+        0 0 75px rgba(255,244,163,.7),
+        inset 0 0 30px rgba(255,244,163,.18);
+}
+
+.tarotCard.legendary {
+    border-color: #ffad66 !important;
+
+    box-shadow:
+        0 0 8px #ffad66,
+        0 0 20px #ffad66,
+        0 0 40px #ffad66,
+        0 0 75px rgba(255,173,102,.7),
+        inset 0 0 30px rgba(255,173,102,.18);
+}
+
+.tarotCard.epic {
+    border-color: #c084fc !important;
+
+    box-shadow:
+        0 0 8px #c084fc,
+        0 0 20px #c084fc,
+        0 0 40px #c084fc,
+        0 0 75px rgba(192,132,252,.7),
+        inset 0 0 30px rgba(192,132,252,.18);
+}
+
+.tarotCard.rare {
+    border-color: #60a5fa !important;
+
+    box-shadow:
+        0 0 8px #60a5fa,
+        0 0 20px #60a5fa,
+        0 0 40px #60a5fa,
+        0 0 75px rgba(96,165,250,.7),
+        inset 0 0 30px rgba(96,165,250,.18);
+}
+
+.tarotCard.common {
+    border-color: #bfc3c7 !important;
+
+    box-shadow:
+        0 0 8px #bfc3c7,
+        0 0 20px #bfc3c7,
+        0 0 40px #bfc3c7,
+        0 0 70px rgba(191,195,199,.65),
+        inset 0 0 30px rgba(191,195,199,.15);
+}
+
+/* ================= ABILITY BELOW CARD ================= */
+
+/*
+   The ability box now has a smoother delayed
+   fade-in after the card has finished flipping.
+*/
+
+.selectedAbility {
+    display: none;
+    margin-top: 25px;
+    padding: 20px;
+
+    border-radius: 15px;
+    background: #111827;
+    text-align: left;
+
+    opacity: 0;
+    transform: translateY(18px) scale(.97);
+
+    /*
+       Starts invisible and slightly lower.
+       The JS adds .abilityVisible only after
+       the card animation has finished.
+    */
+    transition:
+        opacity .8s cubic-bezier(.22,1,.36,1),
+        transform .8s cubic-bezier(.22,1,.36,1);
+}
+
+.selectedAbility.abilityVisible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.selectedAbility h3 {
+    margin-top: 0;
+    font-size: 26px;
+
+    opacity: 0;
+    transform: translateY(8px);
 
     transition:
-        transform .45s ease,
-        box-shadow 2.5s ease,
-        border-color 2.5s ease;
-
-    touch-action:manipulation;
+        opacity .55s ease .15s,
+        transform .55s cubic-bezier(.22,1,.36,1) .15s;
 }
 
-
-.tarotCard::before{
-
-    content:"✦";
-
-    position:absolute;
-
-    font-size:120px;
-
-    color:rgba(255,255,255,.06);
-}
-
-
-.tarotCard::after{
-
-    content:"🃏";
-
-    position:absolute;
-
-    font-size:70px;
-
-    opacity:.8;
-}
-
-
-.tarotCard:hover{
-
-    transform:
-        translateY(-6px)
-        scale(1.02);
-}
-
-
-/* =====================================================
-   CARD PICK ANIMATION
-===================================================== */
-
-.tarotCard.picking{
-
-    animation:
-        tarotPick .65s ease forwards;
-}
-
-@keyframes tarotPick{
-
-    0%{
-        transform:scale(1);
-    }
-
-    25%{
-        transform:
-            scale(1.08)
-            rotate(-2deg);
-    }
-
-    50%{
-        transform:
-            scale(1.12)
-            rotate(2deg);
-    }
-
-    75%{
-        transform:
-            scale(1.06)
-            rotate(-1deg);
-    }
-
-    100%{
-        transform:scale(1);
-    }
-
-}
-
-
-.tarotCard.picking::before{
-
-    animation:
-        cardShine .65s ease;
-}
-
-@keyframes cardShine{
-
-    0%{
-        opacity:.05;
-        transform:scale(.8);
-    }
-
-    50%{
-        opacity:.5;
-        transform:scale(1.4);
-    }
-
-    100%{
-        opacity:.06;
-        transform:scale(1);
-    }
-
-}
-
-
-/* =====================================================
-   SELECTED CARD
-===================================================== */
-
-.tarotCard.selected{
-
-    animation:none;
+.selectedAbility p {
+    opacity: 0;
+    transform: translateY(8px);
 
     transition:
-        box-shadow .8s ease,
-        border-color .8s ease,
-        transform .4s ease;
+        opacity .65s ease .28s,
+        transform .65s cubic-bezier(.22,1,.36,1) .28s;
 }
 
+.selectedAbility .selectedRarity {
+    opacity: 0;
+    transform: translateY(8px) scale(.95);
 
-/* =====================================================
-   RARITY GLOWS
-===================================================== */
-
-.tarotCard.selected.mythic{
-
-    border-color:#fff4a3;
-
-    box-shadow:
-        0 0 12px #fff4a3,
-        0 0 28px #fff4a3,
-        0 0 45px rgba(255,244,163,.55);
+    transition:
+        opacity .55s ease .22s,
+        transform .55s cubic-bezier(.22,1,.36,1) .22s;
 }
 
-
-.tarotCard.selected.legendary{
-
-    border-color:#ffad66;
-
-    box-shadow:
-        0 0 12px #ffad66,
-        0 0 28px #ffad66,
-        0 0 45px rgba(255,173,102,.55);
+.selectedAbility.abilityVisible h3,
+.selectedAbility.abilityVisible p,
+.selectedAbility.abilityVisible .selectedRarity {
+    opacity: 1;
+    transform: translateY(0) scale(1);
 }
 
-
-.tarotCard.selected.epic{
-
-    border-color:#c084fc;
-
-    box-shadow:
-        0 0 12px #c084fc,
-        0 0 28px #c084fc,
-        0 0 45px rgba(192,132,252,.55);
+.selectedRarity {
+    display: inline-block;
+    padding: 6px 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    color: #111827;
+    font-weight: bold;
 }
 
-
-.tarotCard.selected.rare{
-
-    border-color:#60a5fa;
-
-    box-shadow:
-        0 0 12px #60a5fa,
-        0 0 28px #60a5fa,
-        0 0 45px rgba(96,165,250,.55);
+.selectedRarity.mythic {
+    background: #fff4a3;
 }
 
-
-.tarotCard.selected.common{
-
-    border-color:#bfc3c7;
-
-    box-shadow:
-        0 0 10px #bfc3c7,
-        0 0 25px #bfc3c7,
-        0 0 40px rgba(191,195,199,.5);
+.selectedRarity.legendary {
+    background: #ffad66;
 }
 
-
-/* =====================================================
-   CARD REVEAL
-===================================================== */
-
-.tarotCard.selected .cardBack{
-
-    animation:
-        cardReveal .45s ease;
+.selectedRarity.epic {
+    background: #c084fc;
 }
 
-@keyframes cardReveal{
+.selectedRarity.rare {
+    background: #60a5fa;
+}
 
-    0%{
+.selectedRarity.common {
+    background: #bfc3c7;
+}
 
-        opacity:0;
+.drawAgain {
+    display: block;
+    margin: 20px auto 0;
+    padding: 12px 18px;
+    border-radius: 12px;
+    background: #2563eb;
 
-        transform:scale(.85);
+    opacity: 0;
+    transform: translateY(8px);
+
+    transition:
+        opacity .55s ease .42s,
+        transform .55s cubic-bezier(.22,1,.36,1) .42s;
+}
+
+.selectedAbility.abilityVisible .drawAgain {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:700px) {
+
+    .tarotCards {
+        gap: 10px;
+        min-height: 250px;
     }
 
-    100%{
-
-        opacity:1;
-
-        transform:scale(1);
+    .tarotCard {
+        width: 30%;
+        height: 250px;
     }
 
-}
-
-
-/* =====================================================
-   CARD CONTENT
-===================================================== */
-
-.cardBack{
-
-    position:relative;
-
-    z-index:2;
-
-    display:flex;
-
-    flex-direction:column;
-
-    justify-content:center;
-
-    align-items:center;
-}
-
-.cardBackIcon{
-
-    font-size:70px;
-
-    margin-bottom:15px;
-}
-
-.cardBackText{
-
-    font-size:18px;
-
-    font-weight:bold;
-
-    letter-spacing:2px;
-}
-
-.cardBackSubtext{
-
-    margin-top:8px;
-
-    font-size:12px;
-
-    color:#9ca3af;
-}
-
-.cardRarity{
-
-    font-size:16px;
-
-    font-weight:bold;
-
-    text-transform:uppercase;
-
-    letter-spacing:2px;
-
-    margin-bottom:12px;
-}
-
-.cardName{
-
-    font-size:22px;
-
-    font-weight:bold;
-
-    text-align:center;
-}
-
-
-/* =====================================================
-   SELECTED ABILITY
-===================================================== */
-
-.selectedAbility{
-
-    display:none;
-
-    margin-top:25px;
-
-    padding:20px;
-
-    border-radius:15px;
-
-    background:#111827;
-
-    text-align:left;
-}
-
-.selectedAbility h3{
-
-    margin-top:0;
-
-    font-size:26px;
-}
-
-.selectedRarity{
-
-    display:inline-block;
-
-    padding:6px 10px;
-
-    border-radius:8px;
-
-    color:#111827;
-
-    font-weight:bold;
-
-    margin-bottom:10px;
-}
-
-.selectedRarity.mythic{
-    background:#fff4a3;
-}
-
-.selectedRarity.legendary{
-    background:#ffad66;
-}
-
-.selectedRarity.epic{
-    background:#c084fc;
-}
-
-.selectedRarity.rare{
-    background:#60a5fa;
-}
-
-.selectedRarity.common{
-    background:#bfc3c7;
-}
-
-.drawAgain{
-
-    display:block;
-
-    margin:20px auto 0;
-
-    background:#2563eb;
-
-    padding:12px 18px;
-
-    border-radius:12px;
-
-    font-size:16px;
-}
-
-
-/* =====================================================
-   MOBILE
-===================================================== */
-
-@media(max-width:700px){
-
-    .tarotCards{
-        gap:12px;
+    .cardBackIcon {
+        font-size: 50px;
     }
 
-    .tarotCard{
-        width:30%;
-        height:250px;
+    .cardBackText {
+        font-size: 13px;
     }
-
-    .cardBackIcon{
-        font-size:50px;
-    }
-
-    .cardBackText{
-        font-size:13px;
-    }
-
 }
 
+@media(max-width:500px) {
 
-@media(max-width:500px){
-
-    body{
-        padding:10px;
+    body {
+        padding: 8px;
     }
 
-    .container{
-        padding:20px 15px;
+    .container {
+        padding: 18px 13px;
     }
 
-    .tarotMenu{
-        padding:18px 10px;
+    .tarotMenu {
+        padding: 18px 9px;
     }
 
-    .tarotCards{
-        gap:8px;
+    .tarotCards {
+        gap: 7px;
+        min-height: 220px;
     }
 
-    .tarotCard{
-        width:31%;
-        height:220px;
-        padding:8px;
+    .tarotCard {
+        width: 31%;
+        height: 220px;
+        padding: 7px;
     }
 
-    .cardBackIcon{
-        font-size:42px;
+    .cardBackIcon {
+        font-size: 42px;
     }
 
-    .cardBackText{
-        font-size:11px;
+    .cardBackText {
+        font-size: 11px;
     }
 
-    .cardBackSubtext{
-        font-size:9px;
+    .cardBackSubtext {
+        font-size: 9px;
     }
 
+    .revealedContent {
+        padding: 12px;
+    }
+
+    .revealedIcon {
+        width: 55px;
+        height: 55px;
+        font-size: 30px;
+        margin-bottom: 8px;
+    }
+
+    .cardRarity {
+        font-size: 11px;
+        letter-spacing: 2px;
+        margin-bottom: 8px;
+    }
+
+    .cardName {
+        font-size: 15px;
+    }
+
+    .selectedAbility {
+        margin-top: 20px;
+        padding: 17px;
+    }
+
+    .selectedAbility h3 {
+        font-size: 22px;
+    }
 }
 
+@media(max-width:400px) {
 
-@media(max-width:400px){
-
-    .circle{
-
-        width:220px;
-        height:220px;
+    .circle {
+        width: 220px;
+        height: 220px;
     }
 
-    .circle::before{
-
-        width:175px;
-        height:175px;
+    .circle::before {
+        width: 175px;
+        height: 175px;
     }
 
-    .timer{
-        font-size:48px;
+    .timer {
+        font-size: 48px;
     }
 
-    .startCircle{
-
-        width:130px;
-        height:130px;
-
-        font-size:26px;
+    .startCircle {
+        width: 130px;
+        height: 130px;
+        font-size: 26px;
     }
 
-    .multiplier button{
-
-        width:95px;
-        height:55px;
+    .multiplier button {
+        width: 95px;
+        height: 55px;
     }
 
+    .tarotCard {
+        height: 200px;
+    }
+
+    .revealedIcon {
+        width: 48px;
+        height: 48px;
+        font-size: 25px;
+    }
+
+    .cardName {
+        font-size: 13px;
+    }
 }
-
-
-/* =====================================================
-   REDUCED MOTION
-===================================================== */
-
-@media(prefers-reduced-motion:reduce){
-
-    *,
-    *::before,
-    *::after{
-
-        animation-duration:.01ms !important;
-
-        transition-duration:.01ms !important;
-
-    }
-
-}
-
 </style>
 </head>
 
 <body>
 
-
-<!-- =====================================================
-     MAIN TIMER
-===================================================== -->
-
 <div class="container">
 
     <h1>Respawn Timer</h1>
 
-
-    <!-- CIRCULAR TIMER -->
-
-    <div
-        class="circle"
-        id="circle"
-    >
-
-        <div
-            id="display"
-            class="timer"
-        >
-            00:30
-        </div>
-
+    <div class="circle" id="circle">
+        <div class="timer" id="display">00:30</div>
     </div>
 
-
-    <!-- START -->
-
-    <button
-        class="startCircle"
-        onclick="startTimer()"
-    >
+    <button class="startCircle" onclick="startTimer()">
         START
     </button>
 
     <br>
 
-
-    <!-- PAUSE / RESET -->
-
-    <button
-        class="pause small"
-        onclick="pauseTimer()"
-    >
-        ⏸
-    </button>
-
-    <button
-        class="reset small"
-        onclick="resetTimer()"
-    >
-        ↻
-    </button>
-
-
-    <!-- CUSTOM TIMER -->
+    <button class="pause small" onclick="pauseTimer()">⏸</button>
+    <button class="reset small" onclick="resetTimer()">↻</button>
 
     <h3>Timer Duration</h3>
 
-    <button
-        class="small"
-        onclick="changeTime(-5)"
-    >
-        -5
-    </button>
+    <button class="small" onclick="changeTime(-5)">-5</button>
 
     <input
         id="customTime"
         type="number"
         value="30"
-        min="0"
-    >
+        min="0">
 
-    <button
-        class="small"
-        onclick="changeTime(5)"
-    >
-        +5
-    </button>
-
-
-    <!-- MULTIPLIERS -->
+    <button class="small" onclick="changeTime(5)">+5</button>
 
     <h3>Multiplier</h3>
 
     <div class="multiplier">
-
-        <button
-            onclick="multiStart(2)"
-        >
-            2X
-        </button>
-
-        <button
-            onclick="multiStart(3)"
-        >
-            3X
-        </button>
-
+        <button onclick="multiStart(2)">2X</button>
+        <button onclick="multiStart(3)">3X</button>
     </div>
-
-
-    <!-- FIVE OF TIME -->
 
     <div class="toggle">
-
-        <span>
-            Five of Time
-        </span>
+        <span>Five of Time</span>
 
         <label class="switch">
-
-            <input
-                id="fiveTime"
-                type="checkbox"
-            >
-
+            <input id="fiveTime" type="checkbox">
             <span class="slider"></span>
-
         </label>
-
     </div>
-
-
-    <!-- NO RESPAWN -->
 
     <div class="toggle">
-
-        <span>
-            No Respawn Time
-        </span>
+        <span>No Respawn Time</span>
 
         <label class="switch">
-
-            <input
-                id="noRespawn"
-                type="checkbox"
-            >
-
+            <input id="noRespawn" type="checkbox">
             <span class="slider"></span>
-
         </label>
-
     </div>
 
-
-    <!-- TAROT -->
-
-    <button
-        class="tarotButton"
-        onclick="openTarot()"
-    >
+    <button class="tarotButton" onclick="openTarot()">
         🃏 TAROT CARDS
     </button>
 
 </div>
 
-
-<!-- =====================================================
-     TIME UP
-===================================================== -->
-
-<div
-    id="timeup"
-    class="timeup"
->
+<div id="timeup" class="timeup">
     TIME UP
 </div>
 
-
-<!-- =====================================================
-     TAROT OVERLAY
-===================================================== -->
-
-<div
-    id="tarotOverlay"
-    class="tarotOverlay"
->
+<div id="tarotOverlay" class="tarotOverlay">
 
     <div class="tarotMenu">
 
-        <button
-            class="closeTarot"
-            onclick="closeTarot()"
-        >
+        <button class="closeTarot" onclick="closeTarot()">
             ✕
         </button>
 
-
-        <h2>
-            🃏 Tarot Cards
-        </h2>
-
+        <h2>🃏 Tarot Cards</h2>
 
         <p class="tarotSubtitle">
             Choose ONE card
         </p>
 
+        <div id="tarotCards" class="tarotCards"></div>
 
-        <div
-            id="tarotCards"
-            class="tarotCards"
-        ></div>
-
-
-        <div
-            id="selectedAbility"
-            class="selectedAbility"
-        ></div>
+        <div id="selectedAbility" class="selectedAbility"></div>
 
     </div>
 
 </div>
 
-
 <script>
 
-/* =====================================================
+/* =========================================================
    TIMER
-===================================================== */
+========================================================= */
 
 let timer = null;
-
 let seconds = 30;
-
 let totalSeconds = 30;
-
 let running = false;
-
 let fiveValue = 0;
-
-
-/* =====================================================
-   AUDIO
-===================================================== */
-
 let audioContext = null;
 
+const display = document.getElementById("display");
+const circle = document.getElementById("circle");
+const noRespawnToggle = document.getElementById("noRespawn");
+const fiveTimeToggle = document.getElementById("fiveTime");
+const customTime = document.getElementById("customTime");
 
-function enableAudio(){
 
-    try{
+/* =========================================================
+   AUDIO
+========================================================= */
 
-        if(!audioContext){
+function enableAudio() {
 
-            audioContext =
-                new (
-                    window.AudioContext ||
-                    window.webkitAudioContext
-                )();
+    try {
+
+        if (!audioContext) {
+
+            audioContext = new (
+                window.AudioContext ||
+                window.webkitAudioContext
+            )();
 
         }
 
-        if(
-            audioContext.state ===
-            "suspended"
-        ){
-
+        if (audioContext.state === "suspended") {
             audioContext.resume();
-
         }
 
+    } catch(e) {
+        console.log("Audio unavailable");
     }
-    catch(error){
-
-        console.log(
-            "Audio unavailable:",
-            error
-        );
-
-    }
-
 }
 
 
-/* =====================================================
-   ELEMENTS
-===================================================== */
-
-const display =
-    document.getElementById(
-        "display"
-    );
-
-const circle =
-    document.getElementById(
-        "circle"
-    );
-
-const noRespawnToggle =
-    document.getElementById(
-        "noRespawn"
-    );
-
-const fiveTimeToggle =
-    document.getElementById(
-        "fiveTime"
-    );
-
-const customTime =
-    document.getElementById(
-        "customTime"
-    );
-
-
-/* =====================================================
+/* =========================================================
    DISPLAY
-===================================================== */
+========================================================= */
 
-function updateDisplay(){
+function updateDisplay() {
 
-    const minutes =
-        Math.floor(
-            seconds / 60
-        );
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
 
-    const secs =
-        seconds % 60;
-
-
-    display.innerHTML =
+    display.textContent =
         `${String(minutes).padStart(2,"0")}:${String(secs).padStart(2,"0")}`;
-
 
     let percent = 0;
 
-
-    if(totalSeconds > 0){
-
-        percent =
-            Math.max(
-                0,
-                Math.min(
-                    1,
-                    seconds / totalSeconds
-                )
-            );
-
+    if (totalSeconds > 0) {
+        percent = Math.max(
+            0,
+            Math.min(1, seconds / totalSeconds)
+        );
     }
-
 
     circle.style.background =
         `conic-gradient(
-            #22c55e
-            ${percent * 360}deg,
-            #374151
-            ${percent * 360}deg
+            #22c55e ${percent * 360}deg,
+            #374151 ${percent * 360}deg
         )`;
-
 }
 
 
-/* =====================================================
+/* =========================================================
    START
-===================================================== */
+========================================================= */
 
-function startTimer(){
+function startTimer() {
 
     enableAudio();
 
+    if (running) return;
 
-    if(running){
-
-        return;
-
-    }
-
-
-    /*
-       Five of Time:
-       0 → 5 → 10 → ... → 60 → 0
-    */
-
-    if(fiveTimeToggle.checked){
+    if (fiveTimeToggle.checked) {
 
         fiveValue += 5;
 
-
-        if(fiveValue > 60){
-
+        if (fiveValue > 60) {
             fiveValue = 0;
-
         }
 
-
-        seconds =
-            fiveValue;
-
+        seconds = fiveValue;
     }
 
-
-    totalSeconds =
-        seconds;
-
-
-    if(seconds <= 0){
-
-        updateDisplay();
-
-        return;
-
+    if (seconds <= 0) {
+        seconds = 5;
     }
 
+    totalSeconds = seconds;
 
     updateDisplay();
 
-
     running = true;
 
+    display.classList.remove("startFlash");
 
-    /*
-       Flash for first 3 seconds.
-    */
+    void display.offsetWidth;
 
-    display.classList.add(
-        "startFlash"
-    );
+    display.classList.add("startFlash");
 
+    setTimeout(() => {
+        display.classList.remove("startFlash");
+    }, 3000);
 
-    setTimeout(
-        function(){
+    timer = setInterval(() => {
 
-            display.classList.remove(
-                "startFlash"
-            );
+        seconds--;
 
-        },
-        3000
-    );
+        updateDisplay();
 
+        if (seconds <= 0) {
+            finishTimer();
+        }
 
-    timer =
-        setInterval(
-            function(){
-
-                seconds--;
-
-                updateDisplay();
-
-
-                if(seconds <= 0){
-
-                    finishTimer();
-
-                }
-
-            },
-            1000
-        );
-
+    },1000);
 }
 
 
-/* =====================================================
-   2X / 3X
-===================================================== */
+/* =========================================================
+   MULTIPLIERS
+========================================================= */
 
-function multiStart(multiplier){
+function multiStart(multiplier) {
 
     enableAudio();
-
 
     clearInterval(timer);
 
     timer = null;
-
     running = false;
 
+    fiveTimeToggle.checked = false;
 
-    fiveTimeToggle.checked =
-        false;
+    seconds =
+        multiplier === 2
+        ? 60
+        : 90;
 
-
-    if(multiplier === 2){
-
-        seconds = 60;
-
-    }
-
-
-    if(multiplier === 3){
-
-        seconds = 90;
-
-    }
-
-
-    totalSeconds =
-        seconds;
-
-
-    customTime.value =
-        seconds;
-
+    totalSeconds = seconds;
+    customTime.value = seconds;
 
     updateDisplay();
 
-
     startTimer();
-
 }
 
 
-/* =====================================================
+/* =========================================================
    NO RESPAWN
-===================================================== */
+========================================================= */
 
 noRespawnToggle.addEventListener(
     "change",
-    function(){
+    function() {
 
-        if(this.checked){
+        if (this.checked) {
 
             enableAudio();
-
 
             clearInterval(timer);
 
             timer = null;
-
             running = false;
 
-
             seconds = 45;
-
             totalSeconds = 45;
-
 
             customTime.value = 45;
 
-
             updateDisplay();
 
-
-            /*
-               Start immediately.
-            */
-
             startTimer();
-
         }
-
     }
 );
 
 
-/* =====================================================
+/* =========================================================
    PAUSE
-===================================================== */
+========================================================= */
 
-function pauseTimer(){
+function pauseTimer() {
 
     clearInterval(timer);
 
     timer = null;
-
     running = false;
-
 }
 
 
-/* =====================================================
+/* =========================================================
    RESET
-===================================================== */
+========================================================= */
 
-function resetTimer(){
+function resetTimer() {
 
     clearInterval(timer);
 
     timer = null;
-
     running = false;
 
-
     seconds = 30;
-
     totalSeconds = 30;
-
     fiveValue = 0;
-
 
     customTime.value = 30;
 
-
-    noRespawnToggle.checked =
-        false;
-
+    noRespawnToggle.checked = false;
 
     updateDisplay();
-
 }
 
 
-/* =====================================================
-   CHANGE TIME
-===================================================== */
+/* =========================================================
+   TIMER ADJUSTMENT
+========================================================= */
 
-function changeTime(amount){
+function changeTime(amount) {
 
     clearInterval(timer);
 
     timer = null;
-
     running = false;
 
-
-    let value =
-        parseInt(
-            customTime.value
-        ) || 0;
-
+    let value = parseInt(customTime.value) || 0;
 
     value += amount;
 
-
-    if(value < 0){
-
+    if (value < 0) {
         value = 0;
-
     }
 
+    customTime.value = value;
 
-    customTime.value =
-        value;
-
-
-    seconds =
-        value;
-
-    totalSeconds =
-        value;
-
+    seconds = value;
+    totalSeconds = value;
 
     updateDisplay();
-
 }
 
 
 customTime.addEventListener(
     "change",
-    function(){
+    function() {
 
         clearInterval(timer);
 
         timer = null;
-
         running = false;
 
+        let value = parseInt(this.value) || 0;
 
-        let value =
-            parseInt(
-                this.value
-            ) || 0;
-
-
-        if(value < 0){
-
+        if (value < 0) {
             value = 0;
-
         }
 
+        this.value = value;
 
-        this.value =
-            value;
-
-
-        seconds =
-            value;
-
-        totalSeconds =
-            value;
-
+        seconds = value;
+        totalSeconds = value;
 
         updateDisplay();
-
     }
 );
 
 
-/* =====================================================
+/* =========================================================
    TIMER FINISH
-===================================================== */
+========================================================= */
 
-function finishTimer(){
+function finishTimer() {
 
     clearInterval(timer);
 
     timer = null;
-
     running = false;
-
 
     seconds = 0;
 
-
     updateDisplay();
 
+    document.body.classList.add("flash");
 
-    document.body.classList.add(
-        "flash"
-    );
+    document.getElementById("timeup").style.display = "flex";
 
-
-    document.getElementById(
-        "timeup"
-    ).style.display =
-        "flex";
-
-
-    /*
-       No Respawn uses 3 beeps.
-    */
-
-    if(noRespawnToggle.checked){
+    if (noRespawnToggle.checked) {
 
         threeBeeps();
 
+        noRespawnToggle.checked = false;
 
-        noRespawnToggle.checked =
-            false;
-
-    }
-
-    else{
+    } else {
 
         normalBeep();
-
     }
 
+    setTimeout(() => {
 
-    /*
-       Alert lasts only 3 seconds.
-    */
+        document.getElementById("timeup").style.display = "none";
 
-    setTimeout(
-        function(){
+        document.body.classList.remove("flash");
 
-            document.getElementById(
-                "timeup"
-            ).style.display =
-                "none";
+        seconds = 30;
+        totalSeconds = 30;
+        fiveValue = 0;
 
+        customTime.value = 30;
 
-            document.body.classList.remove(
-                "flash"
-            );
+        updateDisplay();
 
-
-            /*
-               Return to default 30 seconds.
-            */
-
-            seconds = 30;
-
-            totalSeconds = 30;
-
-            fiveValue = 0;
-
-            customTime.value = 30;
-
-
-            updateDisplay();
-
-        },
-        3000
-    );
-
+    },3000);
 }
 
 
-/* =====================================================
+/* =========================================================
    NORMAL SOUND
-===================================================== */
+========================================================= */
 
-function normalBeep(){
+function normalBeep() {
 
     enableAudio();
 
+    if (!audioContext) return;
 
-    if(!audioContext){
+    const osc = audioContext.createOscillator();
+    const gain = audioContext.createGain();
 
-        return;
-
-    }
-
-
-    const osc =
-        audioContext.createOscillator();
-
-    const gain =
-        audioContext.createGain();
-
-
-    osc.type =
-        "sine";
-
-    osc.frequency.value =
-        700;
-
+    osc.type = "sine";
+    osc.frequency.value = 700;
 
     osc.connect(gain);
+    gain.connect(audioContext.destination);
 
-    gain.connect(
-        audioContext.destination
-    );
+    const now = audioContext.currentTime;
 
-
-    const now =
-        audioContext.currentTime;
-
-
-    gain.gain.setValueAtTime(
-        .25,
-        now
-    );
-
+    gain.gain.setValueAtTime(.25,now);
 
     gain.gain.exponentialRampToValueAtTime(
         .01,
-        now + 1.5
+        now + 1.2
     );
-
 
     osc.start(now);
-
-    osc.stop(
-        now + 1.5
-    );
-
+    osc.stop(now + 1.2);
 }
 
 
-/* =====================================================
+/* =========================================================
    THREE BEEPS
-===================================================== */
+========================================================= */
 
-function threeBeeps(){
+function threeBeeps() {
 
     enableAudio();
 
+    if (!audioContext) return;
 
-    if(!audioContext){
+    for (let i = 0; i < 3; i++) {
 
-        return;
-
-    }
-
-
-    for(
-        let i = 0;
-        i < 3;
-        i++
-    ){
-
-        const osc =
-            audioContext.createOscillator();
-
-        const gain =
-            audioContext.createGain();
-
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
 
         const start =
-            audioContext.currentTime
-            + (i * .7);
+            audioContext.currentTime +
+            i * .55;
 
-
-        osc.type =
-            "square";
-
-        osc.frequency.value =
-            900;
-
+        osc.type = "square";
+        osc.frequency.value = 900;
 
         osc.connect(gain);
+        gain.connect(audioContext.destination);
 
-        gain.connect(
-            audioContext.destination
-        );
-
-
-        gain.gain.setValueAtTime(
-            .3,
-            start
-        );
-
-
-        gain.gain.setValueAtTime(
-            0,
-            start + .25
-        );
-
+        gain.gain.setValueAtTime(.3,start);
+        gain.gain.setValueAtTime(0,start + .25);
 
         osc.start(start);
-
-        osc.stop(
-            start + .3
-        );
-
+        osc.stop(start + .3);
     }
-
 }
 
 
-/* =====================================================
+/* =========================================================
    TAROT ABILITIES
-===================================================== */
+========================================================= */
 
 const tarotAbilities = [
 
+    // =========================
+    // MYTHIC
+    // =========================
+
     {
-        name:"The Human Shield",
-
-        rarity:"Mythic",
-
-        className:"mythic",
-
+        name: "The Human Shield",
+        rarity: "Mythic",
+        className: "mythic",
+        icon: "✦",
         description:
-        "This ability allows the user to drop their weapon and no longer be able to deal or take ANY damage. This also means they are not allowed to damage environmental objects unless it is impossible to avoid. The user also cannot stand too close to enemy players. This ability ends if your teammate is killed or you decide for it to end.",
-
-        weight:1
+        "Drop your weapon and become unable to deal or take ANY damage. You also cannot damage environmental objects unless it is impossible to avoid, and you cannot stand too close to enemy players. The ability ends if your teammate is eliminated or you choose to end it.",
+        weight: 1
     },
 
     {
-        name:"Swapper",
-
-        rarity:"Legendary",
-
-        className:"legendary",
-
+        name: "Juiced Up",
+        rarity: "Mythic",
+        className: "mythic",
+        icon: "⚡",
         description:
-        "This ability can only be used once and allows you to switch weapons with the opponent after hitting them.",
+        "Get pumped! After getting a kill, your respawn time is removed, allowing you to instantly respawn once. You can store a maximum of one instant respawn.",
+        weight: 1
+    },
 
-        weight:5
+
+    // =========================
+    // LEGENDARY
+    // =========================
+
+    {
+        name: "Swapper",
+        rarity: "Legendary",
+        className: "legendary",
+        icon: "♛",
+        description:
+        "After hitting an opponent, you may switch weapons with them. This ability can only be used once.",
+        weight: 5
     },
 
     {
-        name:"Endless Mag",
-
-        rarity:"Epic",
-
-        className:"epic",
-
+        name: "Bodyguard",
+        rarity: "Legendary",
+        className: "legendary",
+        icon: "🛡",
         description:
-        "Upgrades your weapon's magazine, if it can accept one, to the highest possible magazine capacity.",
+        "Choose one teammate to protect. If they are eliminated while you are still alive, your darts immediately count as double until you respawn. This ability can be traded for a medium ammo crate.",
+        weight: 5
+    },
 
-        weight:14
+
+    // =========================
+    // EPIC
+    // =========================
+
+    {
+        name: "Endless Mag",
+        rarity: "Epic",
+        className: "epic",
+        icon: "◆",
+        description:
+        "Upgrade your weapon's magazine, if compatible, to the highest possible magazine size.",
+        weight: 14
     },
 
     {
-        name:"Shields Up",
-
-        rarity:"Rare",
-
-        className:"rare",
-
+        name: "Five of Time",
+        rarity: "Epic",
+        className: "epic",
+        icon: "⏱",
         description:
-        "1 shield is granted until death. This can only be used once. This can also be traded for a small ammo crate if you already have a shield.",
-
-        weight:25
+        "Your respawn timer begins at zero. Each elimination increases your respawn time by 5 seconds, up to a maximum of 60 seconds. After reaching 60 seconds, the timer resets to zero.",
+        weight: 14
     },
 
     {
-        name:"+1 Instant Respawn",
+        name: "Glass Cannon",
+        rarity: "Epic",
+        className: "epic",
+        icon: "⚔",
+        description:
+        "Your damage is doubled, but damage from an opponent's shot against you is also doubled. This ability can be used multiple times, but once activated, it cannot be stopped until you respawn.",
+        weight: 14
+    },
 
-        rarity:"Common",
+    {
+        name: "Second Chance",
+        rarity: "Epic",
+        className: "epic",
+        icon: "↻",
+        description:
+        "After being eliminated, place your weapon on the ground, pick it back up, and instantly respawn on the spot. You remain vulnerable and can be hit during this respawn. Can be used every 2 kills.",
+        weight: 14
+    },
 
-        className:"common",
+    {
+        name: "The King",
+        rarity: "Epic",
+        className: "epic",
+        icon: "♔",
+        description:
+        "Choose one teammate as the King. While the King is alive, you receive 1 Tarot Card whenever you knock over a cup. If the King is eliminated, this ability ends permanently.",
+        weight: 14
+    },
 
+    {
+        name: "The Last Word",
+        rarity: "Epic",
+        className: "epic",
+        icon: "☄",
+        description:
+        "After being eliminated, you may fire one final shot from your position before returning to the respawn area. If the shot hits, the target must return to their respawn area. Can be used after 2 kills.",
+        weight: 14
+    },
+
+    {
+        name: "The Jackpot",
+        rarity: "Epic",
+        className: "epic",
+        icon: "🎰",
+        description:
+        "Receive 3 Tarot Cards after knocking over a cup. Can only be used once.",
+        weight: 14
+    },
+
+
+    // =========================
+    // RARE
+    // =========================
+
+    {
+        name: "Shields Up",
+        rarity: "Rare",
+        className: "rare",
+        icon: "★",
+        description:
+        "Gain 1 shield until death. Can only be used once. If you already have a shield, you may trade this ability for a small ammo crate.",
+        weight: 25
+    },
+
+    {
+        name: "Broken Weapon",
+        rarity: "Rare",
+        className: "rare",
+        icon: "⚒",
+        description:
+        "Break your weapon, preventing you from using it until your teammate gets a kill. When activated, choose between two different weapons selected at the start of the match.",
+        weight: 25
+    },
+
+    {
+        name: "Better Mag",
+        rarity: "Rare",
+        className: "rare",
+        icon: "▣",
+        description:
+        "Upgrade your weapon's magazine, if compatible, to the next closest magazine size.",
+        weight: 25
+    },
+
+    {
+        name: "No Respawn Time",
+        rarity: "Rare",
+        className: "rare",
+        icon: "⌛",
+        description:
+        "Start your respawn timer and no longer need to wait if you are hit. You must still return to your respawn area after being hit. Once the timer expires, you must wait normally if you are hit again.",
+        weight: 25
+    },
+
+    {
+        name: "Shield Buster",
+        rarity: "Rare",
+        className: "rare",
+        icon: "💥",
+        description:
+        "Gain a Shield Blaster dart for every second kill, starting with 1. You can hold a maximum of 1. The shield is restored if you return to your spawn area or eliminate the player who shot your shield. Bullets cannot be picked up.",
+        weight: 25
+    },
+
+    {
+        name: "Marked",
+        rarity: "Rare",
+        className: "rare",
+        icon: "🎯",
+        description:
+        "Mark one of your cups. You must have all cups available to use this ability. If your marked cup is knocked over, receive one small benefit of your choice: an instant respawn, ammo crate, ability reset, or Tarot Card.",
+        weight: 25
+    },
+
+
+    // =========================
+    // COMMON
+    // =========================
+
+    {
+        name: "+1 Instant Respawn",
+        rarity: "Common",
+        className: "common",
+        icon: "✧",
         description:
         "One player on your team may instantly respawn once after reaching the respawn area, with no wait time. This is a single-use ability and applies to one player of your choice.",
+        weight: 55
+    },
 
-        weight:55
+    {
+        name: "+1 Ammo Crate",
+        rarity: "Common",
+        className: "common",
+        icon: "▤",
+        description:
+        "Your team receives 1 additional ammo crate, deployed at the start of the game.",
+        weight: 55
+    },
+
+    {
+        name: "Cup Repair",
+        rarity: "Common",
+        className: "common",
+        icon: "♢",
+        description:
+        "Restore 1 cup that has been knocked over, returning it to its original position. Single use.",
+        weight: 55
     }
 
 ];
 
 
-/* =====================================================
-   RANDOM RARITY
-===================================================== */
+/* =========================================================
+   RANDOM GLOW COLORS
+========================================================= */
 
-function getRandomAbility(){
-
-    const totalWeight =
-        tarotAbilities.reduce(
-            function(sum,ability){
-
-                return sum +
-                    ability.weight;
-
-            },
-            0
-        );
-
-
-    let random =
-        Math.random()
-        * totalWeight;
-
-
-    for(
-        const ability
-        of tarotAbilities
-    ){
-
-        random -=
-            ability.weight;
-
-
-        if(random <= 0){
-
-            return ability;
-
-        }
-
-    }
-
-
-    return tarotAbilities[
-        tarotAbilities.length - 1
-    ];
-
-}
-
-
-/* =====================================================
-   TAROT GLOW COLOURS
-===================================================== */
-
-const tarotGlowColors = [
-
+const glowColors = [
     "#ff6b81",
     "#ff9f43",
     "#ffd166",
@@ -2174,162 +1611,121 @@ const tarotGlowColors = [
     "#b197fc",
     "#f783ac",
     "#ffffff"
-
 ];
 
 
-function randomTarotColor(){
+/* =========================================================
+   WEIGHTED RANDOM ABILITY
+========================================================= */
 
-    return tarotGlowColors[
-        Math.floor(
-            Math.random()
-            * tarotGlowColors.length
-        )
-    ];
+function getRandomAbility() {
 
-}
+    const total = tarotAbilities.reduce(
+        (sum,a) => sum + (a.weight || 1),
+        0
+    );
 
+    let random = Math.random() * total;
 
-/* =====================================================
-   SLOW RANDOM TAROT GLOW
-===================================================== */
+    for (const ability of tarotAbilities) {
 
-function animateTarotGlow(card){
+        random -= ability.weight || 1;
 
-    if(
-        card.classList.contains("selected") ||
-        card.classList.contains("picking")
-    ){
-
-        return;
-
+        if (random <= 0) {
+            return ability;
+        }
     }
 
-
-    const color =
-        randomTarotColor();
-
-
-    card.style.borderColor =
-        color;
-
-
-    card.style.boxShadow = `
-
-        0 0 8px ${color},
-
-        0 0 18px ${color},
-
-        0 0 32px rgba(255,255,255,.12)
-
-    `;
-
-
-    /*
-       Slow colour transition.
-    */
-
-    setTimeout(
-        function(){
-
-            animateTarotGlow(card);
-
-        },
-        2500 +
-        Math.random() * 1500
-    );
-
+    return tarotAbilities[tarotAbilities.length - 1];
 }
 
 
-/* =====================================================
-   OPEN TAROT
-===================================================== */
+/* =========================================================
+   RANDOM CARD GLOW
+========================================================= */
 
-function openTarot(){
+function animateRandomGlow(card) {
+
+    if (
+        card.dataset.selected === "true" ||
+        card.dataset.disappearing === "true"
+    ) {
+        return;
+    }
+
+    const color =
+        glowColors[
+            Math.floor(
+                Math.random() * glowColors.length
+            )
+        ];
+
+    card.style.borderColor = color;
+
+    card.style.boxShadow =
+        `0 0 7px ${color},
+         0 0 16px ${color},
+         0 0 28px rgba(255,255,255,.08)`;
+
+    setTimeout(
+        () => animateRandomGlow(card),
+        3200 + Math.random() * 1400
+    );
+}
+
+
+/* =========================================================
+   OPEN TAROT
+========================================================= */
+
+function openTarot() {
 
     const overlay =
-        document.getElementById(
-            "tarotOverlay"
-        );
+        document.getElementById("tarotOverlay");
 
-    const cardContainer =
-        document.getElementById(
-            "tarotCards"
-        );
+    const cards =
+        document.getElementById("tarotCards");
 
     const selected =
-        document.getElementById(
-            "selectedAbility"
-        );
+        document.getElementById("selectedAbility");
 
-    const tarotButton =
-        document.querySelector(
-            ".tarotButton"
-        );
+    const button =
+        document.querySelector(".tarotButton");
 
 
-    /*
-       Button press animation.
-    */
-
-    tarotButton.classList.remove(
+    button.classList.remove(
         "tarotButtonPressed"
     );
 
-    void tarotButton.offsetWidth;
+    void button.offsetWidth;
 
-    tarotButton.classList.add(
+    button.classList.add(
         "tarotButtonPressed"
     );
 
 
-    /*
-       Reset previous selection.
-    */
+    selected.style.display = "none";
+    selected.classList.remove("abilityVisible");
+    selected.innerHTML = "";
 
-    selected.style.display =
-        "none";
-
-    selected.innerHTML =
-        "";
-
-    cardContainer.innerHTML =
-        "";
+    cards.innerHTML = "";
 
 
-    /*
-       Make three cards.
-    */
-
-    for(
-        let i = 0;
-        i < 3;
-        i++
-    ){
+    for (let i = 0; i < 3; i++) {
 
         const ability =
             getRandomAbility();
 
-
         const card =
-            document.createElement(
-                "div"
-            );
-
+            document.createElement("div");
 
         card.className =
-            "tarotCard";
+            "tarotCard cardEntering";
 
+        card.dataset.selected = "false";
+        card.dataset.disappearing = "false";
 
-        card.tarotAbility =
-            ability;
-
-
-        /*
-           All cards look exactly
-           the same before selection.
-        */
+        card.ability = ability;
 
         card.innerHTML = `
 
@@ -2354,291 +1750,383 @@ function openTarot(){
 
         card.addEventListener(
             "click",
-            function(){
-
-                selectTarotCard(
-                    ability,
-                    card
-                );
-
-            }
+            () => selectTarotCard(
+                card,
+                ability
+            ),
+            {once:true}
         );
 
 
-        cardContainer.appendChild(
-            card
-        );
+        cards.appendChild(card);
 
 
-        /*
-           Start slow random glow.
-        */
+        setTimeout(() => {
 
-        animateTarotGlow(card);
+            card.classList.remove(
+                "cardEntering"
+            );
 
+            card.classList.add(
+                "cardEntered"
+            );
+
+            animateRandomGlow(card);
+
+        },80 + i * 90);
     }
 
 
-    /*
-       Show overlay.
-    */
+    overlay.style.display = "flex";
 
-    overlay.style.display =
-        "flex";
+    requestAnimationFrame(() => {
+
+        requestAnimationFrame(() => {
+
+            overlay.classList.add("open");
+
+        });
+
+    });
+}
 
 
-    /*
-       Start opening animation
-       on next browser frame.
-    */
+/* =========================================================
+   SELECT CARD
+========================================================= */
 
-    requestAnimationFrame(
-        function(){
+function selectTarotCard(card,ability) {
 
-            requestAnimationFrame(
-                function(){
+    if (
+        card.dataset.selected === "true"
+    ) {
+        return;
+    }
 
-                    overlay.classList.add(
-                        "tarotOpen"
+    card.dataset.selected = "true";
+
+
+    const container =
+        document.getElementById("tarotCards");
+
+    const cards =
+        Array.from(container.children);
+
+
+    cards.forEach(other => {
+
+        other.style.pointerEvents = "none";
+
+        if (other !== card) {
+
+            other.dataset.disappearing = "true";
+
+            other.classList.add(
+                "disappearing"
+            );
+        }
+    });
+
+
+    const cardRect =
+        card.getBoundingClientRect();
+
+    const containerRect =
+        container.getBoundingClientRect();
+
+    const cardCenter =
+        cardRect.left +
+        cardRect.width / 2;
+
+    const containerCenter =
+        containerRect.left +
+        containerRect.width / 2;
+
+    const distance =
+        containerCenter - cardCenter;
+
+
+    card.style.transition =
+        "transform .8s cubic-bezier(.22,1,.36,1)";
+
+    card.style.transform =
+        `translate3d(${distance}px,0,0) scale(1.05)`;
+
+
+    setTimeout(() => {
+
+        smoothFlip(
+            card,
+            ability,
+            distance
+        );
+
+    },820);
+}
+
+
+/* =========================================================
+   SMOOTH CARD FLIP
+========================================================= */
+
+function smoothFlip(card,ability,distance) {
+
+    card.style.transition = "none";
+
+    card.style.transform =
+        `translate3d(${distance}px,0,0) scale(1.05)`;
+
+
+    requestAnimationFrame(() => {
+
+        requestAnimationFrame(() => {
+
+            card.style.transition =
+                "transform .42s cubic-bezier(.65,0,.35,1)";
+
+            card.style.transform =
+                `translate3d(${distance}px,0,0)
+                 scale(1.05)
+                 rotateY(90deg)`;
+
+
+            setTimeout(() => {
+
+                setRevealedCard(
+                    card,
+                    ability
+                );
+
+
+                requestAnimationFrame(() => {
+
+                    card.style.transition =
+                        "transform .42s cubic-bezier(.65,0,.35,1)";
+
+                    card.style.transform =
+                        `translate3d(${distance}px,0,0)
+                         scale(1.05)
+                         rotateY(0deg)`;
+
+                });
+
+
+                setTimeout(() => {
+
+                    card.classList.add(
+                        "showRevealed"
                     );
 
-                }
-            );
+                },150);
 
-        }
-    );
 
+                /*
+                   The description underneath is
+                   deliberately delayed until the card
+                   is completely revealed.
+
+                   This creates a smoother "reveal"
+                   instead of appearing at the same
+                   instant as the card flip.
+                */
+
+                setTimeout(() => {
+
+                    showSelectedAbility(
+                        ability
+                    );
+
+                },1050);
+
+            },420);
+
+        });
+
+    });
 }
 
 
-/* =====================================================
-   SELECT TAROT CARD
-===================================================== */
+/* =========================================================
+   SET REVEALED CARD
+========================================================= */
 
-function selectTarotCard(
-    ability,
-    selectedCard
-){
+function setRevealedCard(card,ability) {
 
-    /*
-       Prevent double selection.
-    */
+    const rarityColors = {
 
-    if(
-        selectedCard.classList.contains(
-            "selected"
-        ) ||
-        selectedCard.classList.contains(
-            "picking"
-        )
-    ){
+        mythic: "#fff4a3",
+        legendary: "#ffad66",
+        epic: "#c084fc",
+        rare: "#60a5fa",
+        common: "#bfc3c7"
 
-        return;
+    };
 
-    }
+    const color =
+        rarityColors[
+            ability.className
+        ];
 
 
-    /*
-       Stop random glow.
-    */
+    card.innerHTML = `
 
-    selectedCard.classList.add(
-        "picking"
+        <div
+            class="revealedBackground"
+            style="--rarity-color:${color};">
+        </div>
+
+        <div class="revealedContent">
+
+            <div
+                class="revealedIcon"
+                style="
+                    color:${color};
+                    box-shadow:
+                        0 0 15px ${color},
+                        0 0 30px ${color};
+                ">
+                ${ability.icon}
+            </div>
+
+            <div
+                class="cardRarity"
+                style="
+                    color:${color};
+                    text-shadow:
+                        0 0 8px ${color},
+                        0 0 18px ${color};
+                ">
+                ${ability.rarity}
+            </div>
+
+            <div class="cardName">
+                ${ability.name}
+            </div>
+
+        </div>
+    `;
+
+
+    card.classList.add(
+        ability.className
     );
 
 
-    const cardContainer =
+    card.style.borderColor = color;
+
+    card.style.boxShadow =
+        `0 0 8px ${color},
+         0 0 20px ${color},
+         0 0 40px ${color},
+         0 0 75px ${color},
+         inset 0 0 30px ${color}`;
+}
+
+
+/* =========================================================
+   SHOW ABILITY UNDER CARD
+========================================================= */
+
+function showSelectedAbility(ability) {
+
+    const selected =
         document.getElementById(
-            "tarotCards"
+            "selectedAbility"
         );
 
 
+    selected.innerHTML = `
+
+        <h3>
+            ${ability.name}
+        </h3>
+
+        <div
+            class="selectedRarity ${ability.className}">
+            ${ability.rarity}
+        </div>
+
+        <p>
+            ${ability.description}
+        </p>
+
+        <button
+            class="drawAgain"
+            onclick="drawAgain()">
+            DRAW AGAIN
+        </button>
+
+    `;
+
+
     /*
-       Selection animation.
+       Make it displayable first while still
+       invisible. Then trigger the CSS transition
+       on the next animation frame.
+
+       This makes the fade-in much smoother.
     */
 
-    setTimeout(
-        function(){
+    selected.style.display = "block";
 
-            selectedCard.classList.remove(
-                "picking"
-            );
-
-            selectedCard.classList.add(
-                "selected"
-            );
-
-
-            /*
-               Apply actual rarity glow.
-            */
-
-            selectedCard.classList.add(
-                ability.className
-            );
-
-
-            /*
-               Remove random glow.
-            */
-
-            selectedCard.style.borderColor =
-                "";
-
-            selectedCard.style.boxShadow =
-                "";
-
-
-            /*
-               Remove unselected cards.
-            */
-
-            const cards =
-                Array.from(
-                    cardContainer.children
-                );
-
-
-            cards.forEach(
-                function(card){
-
-                    if(card !== selectedCard){
-
-                        card.remove();
-
-                    }
-
-                }
-            );
-
-
-            /*
-               Reveal card.
-            */
-
-            selectedCard.innerHTML = `
-
-                <div class="cardBack">
-
-                    <div class="cardBackIcon">
-                        🃏
-                    </div>
-
-                    <div class="cardRarity">
-                        ${ability.rarity}
-                    </div>
-
-                    <div class="cardName">
-                        ${ability.name}
-                    </div>
-
-                </div>
-
-            `;
-
-
-            /*
-               Full ability description.
-            */
-
-            const selected =
-                document.getElementById(
-                    "selectedAbility"
-                );
-
-
-            selected.innerHTML = `
-
-                <h3>
-                    ${ability.name}
-                </h3>
-
-                <div
-                    class="selectedRarity ${ability.className}"
-                >
-                    ${ability.rarity}
-                </div>
-
-                <p>
-                    ${ability.description}
-                </p>
-
-                <button
-                    class="drawAgain"
-                    onclick="drawAgain()"
-                >
-                    DRAW AGAIN
-                </button>
-
-            `;
-
-
-            selected.style.display =
-                "block";
-
-        },
-        650
+    selected.classList.remove(
+        "abilityVisible"
     );
 
+
+    requestAnimationFrame(() => {
+
+        requestAnimationFrame(() => {
+
+            selected.classList.add(
+                "abilityVisible"
+            );
+
+        });
+
+    });
 }
 
 
-/* =====================================================
+/* =========================================================
    DRAW AGAIN
-===================================================== */
+========================================================= */
 
-function drawAgain(){
-
+function drawAgain() {
     openTarot();
-
 }
 
 
-/* =====================================================
+/* =========================================================
    CLOSE TAROT
-===================================================== */
+========================================================= */
 
-function closeTarot(){
+function closeTarot() {
 
     const overlay =
         document.getElementById(
             "tarotOverlay"
         );
 
+    overlay.classList.remove("open");
 
-    overlay.classList.remove(
-        "tarotOpen"
-    );
+    setTimeout(() => {
 
+        if (
+            !overlay.classList.contains("open")
+        ) {
 
-    /*
-       Wait for closing animation.
-    */
+            overlay.style.display = "none";
 
-    setTimeout(
-        function(){
+        }
 
-            if(
-                !overlay.classList.contains(
-                    "tarotOpen"
-                )
-            ){
-
-                overlay.style.display =
-                    "none";
-
-            }
-
-        },
-        300
-    );
-
+    },450);
 }
 
 
-/* =====================================================
+/* =========================================================
    INITIALIZE
-===================================================== */
+========================================================= */
 
 updateDisplay();
 
