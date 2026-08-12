@@ -629,11 +629,6 @@ input[type="number"] {
 
 /* ================= ABILITY BELOW CARD ================= */
 
-/*
-   The ability box now has a smoother delayed
-   fade-in after the card has finished flipping.
-*/
-
 .selectedAbility {
     display: none;
     margin-top: 25px;
@@ -646,11 +641,6 @@ input[type="number"] {
     opacity: 0;
     transform: translateY(18px) scale(.97);
 
-    /*
-       Starts invisible and slightly lower.
-       The JS adds .abilityVisible only after
-       the card animation has finished.
-    */
     transition:
         opacity .8s cubic-bezier(.22,1,.36,1),
         transform .8s cubic-bezier(.22,1,.36,1);
@@ -1050,20 +1040,11 @@ function updateDisplay() {
    START
 ========================================================= */
 
-/* =========================================================
-   START
-========================================================= */
-
 function startTimer() {
 
     enableAudio();
 
     if (running) return;
-
-    /* =====================================================
-       FIVE OF TIME
-       5 → 10 → 15 → 20 → ... → 60 → 0 → 5
-    ===================================================== */
 
     if (fiveTimeToggle.checked) {
 
@@ -1075,10 +1056,6 @@ function startTimer() {
 
         seconds = fiveValue;
 
-        /*
-           If it reaches 0, don't start a countdown.
-           The next START will go to 5 seconds.
-        */
         if (fiveValue === 0) {
 
             totalSeconds = 60;
@@ -1090,9 +1067,6 @@ function startTimer() {
 
     } else {
 
-        /*
-           Normal timer
-        */
         if (seconds <= 0) {
             seconds = 30;
         }
@@ -1103,10 +1077,6 @@ function startTimer() {
     updateDisplay();
 
     running = true;
-
-    /* =====================================================
-       START FLASH
-    ===================================================== */
 
     display.classList.remove("startFlash");
 
@@ -1119,11 +1089,6 @@ function startTimer() {
         display.classList.remove("startFlash");
 
     }, 3000);
-
-
-    /* =====================================================
-       COUNTDOWN
-    ===================================================== */
 
     timer = setInterval(() => {
 
@@ -1144,6 +1109,7 @@ function startTimer() {
 
     }, 1000);
 }
+
 
 /* =========================================================
    MULTIPLIERS
@@ -1330,7 +1296,6 @@ function finishTimer() {
 
         seconds = 30;
         totalSeconds = 30;
-
 
         customTime.value = 30;
 
@@ -1641,6 +1606,35 @@ const tarotAbilities = [
 
 
 /* =========================================================
+   RARITY CHANCES
+   =========================================================
+   
+   CHANGE THESE PERCENTAGES ONLY.
+   
+   TOTAL MUST EQUAL 100.
+   
+   Current chances:
+   
+   Mythic     = 1%
+   Legendary = 5%
+   Epic      = 14%
+   Rare      = 25%
+   Common    = 55%
+   
+========================================================= */
+
+const RARITY_CHANCES = {
+
+    mythic: 2,
+    legendary: 5,
+    epic: 14,
+    rare: 24,
+    common: 55
+
+};
+
+
+/* =========================================================
    RANDOM GLOW COLORS
 ========================================================= */
 
@@ -1658,28 +1652,84 @@ const glowColors = [
 
 
 /* =========================================================
-   WEIGHTED RANDOM ABILITY
+   RANDOM ABILITY BY RARITY
 ========================================================= */
 
 function getRandomAbility() {
 
-    const total = tarotAbilities.reduce(
-        (sum,a) => sum + (a.weight || 1),
-        0
-    );
+    /* =====================================================
+       ROLL FOR RARITY
+    ===================================================== */
 
-    let random = Math.random() * total;
+    let random =
+        Math.random() * 100;
 
-    for (const ability of tarotAbilities) {
+    let selectedRarity = null;
 
-        random -= ability.weight || 1;
+    for (const rarity in RARITY_CHANCES) {
+
+        random -= RARITY_CHANCES[rarity];
 
         if (random <= 0) {
-            return ability;
+
+            selectedRarity = rarity;
+
+            break;
         }
     }
 
-    return tarotAbilities[tarotAbilities.length - 1];
+
+    /* =====================================================
+       SAFETY FALLBACK
+    ===================================================== */
+
+    if (!selectedRarity) {
+
+        selectedRarity = "common";
+
+    }
+
+
+    /* =====================================================
+       GET ABILITIES FROM SELECTED RARITY
+    ===================================================== */
+
+    const matchingAbilities =
+        tarotAbilities.filter(
+            ability =>
+                ability.className === selectedRarity
+        );
+
+
+    /* =====================================================
+       RANDOM ABILITY FROM SELECTED RARITY
+       
+       Every ability within the selected rarity
+       has an equal chance.
+    ===================================================== */
+
+    if (matchingAbilities.length > 0) {
+
+        return matchingAbilities[
+            Math.floor(
+                Math.random() *
+                matchingAbilities.length
+            )
+        ];
+
+    }
+
+
+    /* =====================================================
+       FINAL FALLBACK
+    ===================================================== */
+
+    return tarotAbilities[
+        Math.floor(
+            Math.random() *
+            tarotAbilities.length
+        )
+    ];
 }
 
 
@@ -1963,16 +2013,6 @@ function smoothFlip(card,ability,distance) {
                 },150);
 
 
-                /*
-                   The description underneath is
-                   deliberately delayed until the card
-                   is completely revealed.
-
-                   This creates a smoother "reveal"
-                   instead of appearing at the same
-                   instant as the card flip.
-                */
-
                 setTimeout(() => {
 
                     showSelectedAbility(
@@ -2101,14 +2141,6 @@ function showSelectedAbility(ability) {
 
     `;
 
-
-    /*
-       Make it displayable first while still
-       invisible. Then trigger the CSS transition
-       on the next animation frame.
-
-       This makes the fade-in much smoother.
-    */
 
     selected.style.display = "block";
 
